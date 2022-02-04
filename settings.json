@@ -1,0 +1,22 @@
+{
+	"script_path": ".\\script.ps1",
+    "servers": [
+		{
+            "hostname": "machine_1",
+            "credentials": {
+                "username": "machine_1\\Admin",
+                "password": ""
+            }
+        },
+		{
+            "hostname": "machine_2",
+            "credentials": {
+                "username": "machine_2\\Admin",
+                "password": ""
+            }
+        }
+    ],
+	"package_info": {
+		"Id": "bundle/gcd-pos"
+	}
+}
