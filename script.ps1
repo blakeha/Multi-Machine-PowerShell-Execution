@@ -13,7 +13,7 @@ Log("$($server.hostname) has begun executing script.ps1")
 
 # Your custom code here
 
-
+Write-Progress -Activity "Your activity info" -Status "Status info like: 10% Complete!" -PercentComplete 100
 
 Log("$($server.hostname) completed successfully.")
 

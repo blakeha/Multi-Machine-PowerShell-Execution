@@ -7,8 +7,25 @@ $SCRIPT_VERSION = "1.0.0"
 		Write-Output "$("[{0:MM/dd/yy} {0:HH:mm:ss}]" -f (Get-Date)) $($message)"
 	}
 	
+	#Accepts a Job as a parameter and writes the latest progress of it
+	function WriteJobProgress
+	{
+		param($Job)
 	
-	
+		#Make sure the first child job exists
+		if($Job.ChildJobs[0].Progress -ne $null)
+		{
+			#Extracts the latest progress of the job and writes the progress
+			$jobProgressHistory = $Job.ChildJobs[0].Progress;
+			$latestProgress = $jobProgressHistory[$jobProgressHistory.Count - 1];
+			$latestPercentComplete = $latestProgress | Select-Object -expand PercentComplete;
+			$latestActivity = $latestProgress | Select-Object -expand Activity;
+			$latestStatus = $latestProgress | Select-Object -expand StatusDescription;
+		
+			#When adding multiple progress bars, a unique ID must be provided. Here I am providing the JobID as this
+			Write-Progress -Id $Job.Id -Activity $latestActivity -Status $latestStatus -PercentComplete $latestPercentComplete;
+		}
+	}
 	
 	# Get-NetFirewallRule -Name 'WINRM*' | Select-Object Name
 	# Enable-PSRemoting -SkipNetworkProfileCheck -Force
@@ -76,6 +93,12 @@ $SCRIPT_VERSION = "1.0.0"
 	
 	Write-Output "`n`n Waiting for all jobs to complete. Please Hold"
 	
+	while((Get-Job | Where-Object {$_.State -ne "Completed"}).Count -gt 0){
+		foreach ($job in $jobs) {
+			Write-Progress($job);
+		}
+	}
+
 	$res = $jobs | Wait-Job | Receive-Job
 	$res | Out-File -FilePath ".\Logs.txt"
 	$res
